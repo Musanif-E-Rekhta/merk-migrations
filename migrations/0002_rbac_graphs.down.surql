@@ -1,0 +1,4 @@
+REMOVE TABLE IF EXISTS has_permission;
+REMOVE TABLE IF EXISTS assigned_role;
+REMOVE TABLE IF EXISTS permission;
+REMOVE TABLE IF EXISTS role;

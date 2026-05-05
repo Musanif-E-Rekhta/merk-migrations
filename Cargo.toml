@@ -1,0 +1,49 @@
+[workspace]
+members = ["."]
+
+[workspace.package]
+edition = "2024"
+license = "CC0-1.0"
+publish = false
+repository = "https://github.com/Musanif-E-Rekhta/merk-migrations"
+version = "0.1.0"
+
+[workspace.dependencies]
+anyhow = { version = "1" }
+clap = { version = "=4.5.37", features = ["derive", "env"] }
+dotenvy = { version = "0.15" }
+rust-embed = { version = "8.5" }
+serde = { version = "1", features = ["derive"] }
+surrealdb = { version = "3", features = ["http", "kv-mem", "protocol-http", "protocol-ws", "rustls"] }
+thiserror = { version = "2" }
+tokio = { version = "1", features = ["full"] }
+tracing = { version = "0.1" }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[package]
+edition.workspace = true
+license.workspace = true
+name = "merk-migrations"
+publish.workspace = true
+repository.workspace = true
+version.workspace = true
+
+[features]
+cli = ["dep:anyhow", "dep:clap", "dep:dotenvy", "dep:tokio", "dep:tracing-subscriber"]
+
+[dependencies]
+anyhow = { workspace = true, optional = true }
+clap = { workspace = true, optional = true }
+dotenvy = { workspace = true, optional = true }
+rust-embed.workspace = true
+serde.workspace = true
+surrealdb.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true, optional = true }
+tracing.workspace = true
+tracing-subscriber = { workspace = true, optional = true }
+
+[[bin]]
+name = "migrate"
+path = "src/bin/migrate.rs"
+required-features = ["cli"]

@@ -1,0 +1,24 @@
+-- Remove in reverse dependency order (votes → reviews → content → relations → core)
+REMOVE TABLE IF EXISTS translation_vote;
+REMOVE TABLE IF EXISTS word_translation;
+REMOVE TABLE IF EXISTS review_flag;
+REMOVE TABLE IF EXISTS chapter_review_vote;
+REMOVE TABLE IF EXISTS chapter_review;
+REMOVE TABLE IF EXISTS book_review_vote;
+REMOVE TABLE IF EXISTS book_review;
+REMOVE TABLE IF EXISTS comment_vote;
+REMOVE TABLE IF EXISTS comment;
+REMOVE TABLE IF EXISTS highlight;
+REMOVE TABLE IF EXISTS collection_book;
+REMOVE TABLE IF EXISTS collection;
+REMOVE TABLE IF EXISTS reading_goal;
+REMOVE TABLE IF EXISTS reading_session;
+REMOVE TABLE IF EXISTS bookmark;
+REMOVE TABLE IF EXISTS follows;
+REMOVE TABLE IF EXISTS wrote;
+REMOVE TABLE IF EXISTS chapter;
+REMOVE TABLE IF EXISTS book;
+REMOVE TABLE IF EXISTS tag;
+REMOVE TABLE IF EXISTS category;
+REMOVE TABLE IF EXISTS publisher;
+REMOVE TABLE IF EXISTS author;

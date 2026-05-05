@@ -1,0 +1,3 @@
+REMOVE TABLE IF EXISTS token_usage;
+REMOVE TABLE IF EXISTS ai_model;
+REMOVE TABLE IF EXISTS org_setting;
