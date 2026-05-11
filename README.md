@@ -224,3 +224,7 @@ use merk_migrations::Migrator;
 Migrator::up(&db, None).await
     .map_err(|e| Error::internal("migration", e.to_string()))?;
 ```
+
+##TODO:
+
+ - create migrations
