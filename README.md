@@ -2,7 +2,7 @@
 
 Schema migration runner for SurrealDB, embedded into the binary at compile time via [`rust-embed`](https://github.com/pyros2097/rust-embed).
 
-Migration files live in `migrations/` as paired `.up.surql` / `.down.surql` files. The runner tracks applied migrations in a `_migrations` table inside your SurrealDB database.
+Migration files live in `migrations/up/` and `migrations/down/` as paired `.surql` files sharing the same stem. The runner tracks applied migrations in a `_migrations` table inside your SurrealDB database.
 
 ---
 
@@ -10,13 +10,15 @@ Migration files live in `migrations/` as paired `.up.surql` / `.down.surql` file
 
 ```
 migrations/
-  0001_initial_schema.up.surql
-  0001_initial_schema.down.surql
-  0002_rbac_graphs.up.surql
-  0002_rbac_graphs.down.surql
+  up/
+    0001_initial_schema.surql
+    0002_rbac_graphs.surql
+  down/
+    0001_initial_schema.surql
+    0002_rbac_graphs.surql
 ```
 
-Files are sorted lexicographically, so use a zero-padded numeric prefix (`0001_`, `0002_`, …) to control order. Every migration must have both an `.up.surql` and a `.down.surql` — `down` runs on rollback and should undo exactly what `up` did.
+Files are sorted lexicographically by stem, so use a zero-padded numeric prefix (`0001_`, `0002_`, …) to control order. Every migration must have a file in both `up/` and `down/` with the same name — `down` runs on rollback and should undo exactly what `up` did.
 
 ---
 
@@ -42,7 +44,7 @@ Migrator::up(&db, Some(1)).await?;
 
 ### `Migrator::down(db, steps)`
 
-Roll back the last `steps` applied migrations in reverse order (default: 1). Requires a `.down.surql` for each migration being rolled back.
+Roll back the last `steps` applied migrations in reverse order (default: 1). Requires a `down/<name>.surql` for each migration being rolled back.
 
 ```rust
 // Roll back the last migration
@@ -54,7 +56,7 @@ Migrator::down(&db, Some(3)).await?;
 
 ### `Migrator::fresh(db)`
 
-Drop every table in the database (via `INFO FOR DB`) and re-apply all migrations from scratch. Does not require `.down.surql` files — it nukes everything directly. Useful in development.
+Drop every table in the database (via `INFO FOR DB`) and re-apply all migrations from scratch. Does not require `down/` files — it nukes everything directly. Useful in development.
 
 ```rust
 Migrator::fresh(&db).await?;
@@ -62,7 +64,7 @@ Migrator::fresh(&db).await?;
 
 ### `Migrator::refresh(db)`
 
-Roll back all applied migrations using their `.down.surql` files, then re-apply all of them. Unlike `fresh`, this exercises the down path.
+Roll back all applied migrations using their `down/` files, then re-apply all of them. Unlike `fresh`, this exercises the down path.
 
 ```rust
 Migrator::refresh(&db).await?;
@@ -89,7 +91,7 @@ for s in statuses {
 
 | Field     | Type          | Description                          |
 |-----------|---------------|--------------------------------------|
-| `name`    | `String`      | Migration name (filename without extension suffix) |
+| `name`    | `String`      | Migration name (filename stem, shared by the `up/` and `down/` files) |
 | `applied` | `bool`        | Whether it has been applied          |
 | `batch`   | `Option<u32>` | Batch number it was applied in       |
 
@@ -97,21 +99,21 @@ for s in statuses {
 
 ## Adding a new migration
 
-1. Create the two files in `migrations/`:
+1. Create the two files (same name, one in each folder):
 
    ```
-   migrations/0005_my_change.up.surql
-   migrations/0005_my_change.down.surql
+   migrations/up/0005_my_change.surql
+   migrations/down/0005_my_change.surql
    ```
 
-2. Write the forward schema change in `.up.surql`:
+2. Write the forward schema change in `up/`:
 
    ```sql
    DEFINE TABLE IF NOT EXISTS my_table SCHEMALESS;
    DEFINE FIELD name ON my_table TYPE string;
    ```
 
-3. Write the reverse in `.down.surql`:
+3. Write the reverse in `down/`:
 
    ```sql
    REMOVE TABLE IF EXISTS my_table;
@@ -127,12 +129,12 @@ The runner maintains a `_migrations` SCHEMALESS table:
 
 ```
 _migrations
-  name        string   — migration filename stem (e.g. "0001_initial_schema")
+  name        string   — migration filename stem, e.g. "0001_initial_schema" (shared by up/ and down/ files)
   batch       u32      — batch number shared by all migrations in one up() call
   applied_at  datetime — when it was applied
 ```
 
-`fresh` and `refresh` clear this table before re-running. All other tables are left untouched by `down` — only the SQL in your `.down.surql` file runs.
+`fresh` and `refresh` clear this table before re-running. All other tables are left untouched by `down` — only the SQL in your `down/<name>.surql` file runs.
 
 ---
 

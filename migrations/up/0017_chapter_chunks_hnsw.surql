@@ -1,7 +1,8 @@
 -- =============================================================================
 -- Migration 0017: Chapter chunks (semantic search / RAG / recommendations)
---   1k-token windows of chapter text + their embeddings. SurrealDB MTREE
---   handles cosine-similarity nearest-neighbor at query time.
+--   1k-token windows of chapter text + their embeddings. SurrealDB 3.0
+--   dropped MTREE; HNSW is the only remaining vector index variant.
+--   1536 dim matches OpenAI text-embedding-3-small / Voyage voyage-3-lite.
 -- =============================================================================
 
 DEFINE TABLE IF NOT EXISTS chapter_chunk SCHEMAFULL;
@@ -15,4 +16,4 @@ DEFINE FIELD IF NOT EXISTS created_at ON chapter_chunk TYPE datetime DEFAULT tim
 
 DEFINE INDEX IF NOT EXISTS chapter_chunk_ord_idx ON chapter_chunk COLUMNS chapter, ord UNIQUE;
 DEFINE INDEX IF NOT EXISTS chapter_chunk_vec_idx ON chapter_chunk
-    FIELDS embedding MTREE DIMENSION 1536 DIST COSINE;
+    FIELDS embedding HNSW DIMENSION 1536 DIST COSINE TYPE F32;

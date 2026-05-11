@@ -1,3 +1,28 @@
+//! SurrealDB schema migration runner.
+//!
+//! Migration files live in `migrations/up/` and `migrations/down/` as
+//! paired `<name>.surql` files (same stem in both folders), embedded
+//! into the binary at compile time via [`rust-embed`]. Files are sorted
+//! lexicographically; use a zero-padded numeric prefix (`0001_`,
+//! `0002_`, …) to control order.
+//!
+//! `Migrator::up` applies pending migrations and records them in a
+//! `_migrations` table inside the target database; `down` rolls back
+//! the last batch in reverse order; `fresh` drops every table and
+//! re-applies from scratch (development convenience).
+//!
+//! ```ignore
+//! use merk_migrations::Migrator;
+//! Migrator::up(&db, None).await?;       // apply everything pending
+//! Migrator::down(&db, Some(1)).await?;  // roll back the last migration
+//! ```
+//!
+//! Migrations within a single `up` call share the same batch number so
+//! they can be rolled back together. See `README.md` for the full API
+//! and migration-file naming conventions.
+//!
+//! [`rust-embed`]: https://github.com/pyros2097/rust-embed
+
 use rust_embed::RustEmbed;
 use serde::{Deserialize, Serialize};
 use surrealdb::Surreal;
@@ -66,7 +91,7 @@ impl Migrator {
 
         for name in &to_apply {
             info!("Applying migration: {}", name);
-            let sql = load_file(&format!("{}.up.surql", name))?;
+            let sql = load_file(&format!("up/{}.surql", name))?;
             db.query(&sql).await.map_err(|e| MigrationError::Apply {
                 name: name.clone(),
                 cause: e.to_string(),
@@ -102,7 +127,7 @@ impl Migrator {
 
         for record in &to_rollback {
             info!("Rolling back: {}", record.name);
-            let sql = load_file(&format!("{}.down.surql", record.name))
+            let sql = load_file(&format!("down/{}.surql", record.name))
                 .map_err(|_| MigrationError::NoDownFile(record.name.clone()))?;
             db.query(&sql).await.map_err(|e| MigrationError::Rollback {
                 name: record.name.clone(),
@@ -183,11 +208,13 @@ fn discover_migrations() -> Vec<String> {
     let mut names: std::collections::BTreeSet<String> = Default::default();
     for entry in Files::iter() {
         let path = entry.as_ref();
-        if let Some(base) = path
-            .strip_suffix(".up.surql")
-            .or_else(|| path.strip_suffix(".down.surql"))
+        if let Some(rest) = path
+            .strip_prefix("up/")
+            .or_else(|| path.strip_prefix("down/"))
         {
-            names.insert(base.to_string());
+            if let Some(base) = rest.strip_suffix(".surql") {
+                names.insert(base.to_string());
+            }
         }
     }
     names.into_iter().collect()
