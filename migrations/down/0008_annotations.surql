@@ -1,0 +1,3 @@
+REMOVE TABLE IF EXISTS comment_vote;
+REMOVE TABLE IF EXISTS comment;
+REMOVE TABLE IF EXISTS highlight;

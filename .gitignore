@@ -1,2 +1,6 @@
 /target
 Cargo.lock
+
+# Surrealist (SurrealDB UI) drops its query history here when opened
+# in this dir. Scratch — not source.
+history.txt

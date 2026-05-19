@@ -8,23 +8,23 @@ use surrealdb::opt::auth::Root;
 #[command(name = "migrate", about = "SurrealDB migration runner")]
 struct Cli {
     /// SurrealDB connection URL
-    #[arg(long, env = "SURREAL_URL", default_value = "ws://localhost:8000")]
+    #[arg(long, env = "SURREALDB_URL", default_value = "ws://localhost:8000")]
     url: String,
 
     /// Namespace
-    #[arg(long, env = "SURREAL_NS")]
+    #[arg(long, env = "SURREALDB_NS")]
     ns: String,
 
     /// Database
-    #[arg(long, env = "SURREAL_DB")]
+    #[arg(long, env = "SURREALDB_DB")]
     db: String,
 
     /// Root username
-    #[arg(long, env = "SURREAL_USER", default_value = "root")]
+    #[arg(long, env = "SURREALDB_USER", default_value = "root")]
     user: String,
 
     /// Root password
-    #[arg(long, env = "SURREAL_PASS", default_value = "root")]
+    #[arg(long, env = "SURREALDB_PASS", default_value = "root")]
     pass: String,
 
     #[command(subcommand)]
@@ -53,9 +53,21 @@ enum Command {
     Status,
 }
 
+fn load_dotenv() {
+    let mut dir = std::env::current_dir().ok();
+    while let Some(d) = dir {
+        let f = d.join(".env.local");
+        if f.exists() {
+            dotenvy::from_path(&f).ok();
+            return;
+        }
+        dir = d.parent().map(std::path::Path::to_path_buf);
+    }
+}
+
 #[tokio::main]
 async fn main() {
-    dotenvy::from_filename(".env.local").ok();
+    load_dotenv();
     dotenvy::dotenv().ok();
 
     tracing_subscriber::fmt()

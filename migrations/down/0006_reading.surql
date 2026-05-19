@@ -1,0 +1,6 @@
+REMOVE TABLE IF EXISTS follows;
+REMOVE TABLE IF EXISTS collection_book;
+REMOVE TABLE IF EXISTS collection;
+REMOVE TABLE IF EXISTS reading_goal;
+REMOVE TABLE IF EXISTS reading_session;
+REMOVE TABLE IF EXISTS bookmark;

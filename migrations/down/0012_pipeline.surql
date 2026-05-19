@@ -1,0 +1,7 @@
+REMOVE FIELD IF EXISTS ingestion_job ON book;
+REMOVE TABLE IF EXISTS cover_variant;
+REMOVE TABLE IF EXISTS chapter_draft;
+REMOVE TABLE IF EXISTS pdf_page;
+REMOVE TABLE IF EXISTS job_log_entry;
+REMOVE TABLE IF EXISTS pipeline_step;
+REMOVE TABLE IF EXISTS ingestion_job;

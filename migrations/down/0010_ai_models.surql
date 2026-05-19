@@ -1,0 +1,2 @@
+REMOVE TABLE IF EXISTS org_setting;
+REMOVE TABLE IF EXISTS ai_model;

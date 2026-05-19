@@ -1,0 +1,3 @@
+REMOVE TABLE IF EXISTS crawl_target;
+REMOVE TABLE IF EXISTS crawl_run;
+REMOVE TABLE IF EXISTS crawl_source;

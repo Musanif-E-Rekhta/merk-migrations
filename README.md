@@ -151,15 +151,15 @@ cargo build -p merk-migrations --features cli
 
 ### Connection
 
-All connection flags can also be set via environment variables (`.env` is loaded automatically):
+All connection flags can also be set via environment variables (`.env.local` then `.env` are loaded automatically). The names match `merk`/`merk-seed`, so a single workspace `.env.local` covers all three binaries.
 
 | Flag | Env var | Default |
 |------|---------|---------|
-| `--url` | `SURREAL_URL` | `ws://localhost:8000` |
-| `--ns`  | `SURREAL_NS`  | *(required)* |
-| `--db`  | `SURREAL_DB`  | *(required)* |
-| `--user`| `SURREAL_USER`| `root` |
-| `--pass`| `SURREAL_PASS`| `root` |
+| `--url` | `SURREALDB_URL` | `ws://localhost:8000` |
+| `--ns`  | `SURREALDB_NS`  | *(required)* |
+| `--db`  | `SURREALDB_DB`  | *(required)* |
+| `--user`| `SURREALDB_USER`| `root` |
+| `--pass`| `SURREALDB_PASS`| `root` |
 
 ### Commands
 
@@ -200,12 +200,12 @@ migrate --ns prod --db merk status
 ### Using a .env file
 
 ```sh
-# .env
-SURREAL_URL=ws://localhost:8000
-SURREAL_NS=prod
-SURREAL_DB=merk
-SURREAL_USER=root
-SURREAL_PASS=root
+# .env.local (shared with merk + merk-seed)
+SURREALDB_URL=ws://localhost:8000
+SURREALDB_NS=prod
+SURREALDB_DB=merk
+SURREALDB_USER=root
+SURREALDB_PASS=root
 ```
 
 ```sh
